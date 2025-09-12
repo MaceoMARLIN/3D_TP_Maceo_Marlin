@@ -13,7 +13,6 @@ public class CameraBehaviourScript : MonoBehaviour
     public float minDistanceFromPlayer = 2f;
     private float yaw = 0f;
     private float pitch = 0f;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         Vector3 angles = transform.eulerAngles;
@@ -21,7 +20,6 @@ public class CameraBehaviourScript : MonoBehaviour
         pitch = angles.x;
     }
 
-    // Update is called once per frame
     void Update()
     {
         

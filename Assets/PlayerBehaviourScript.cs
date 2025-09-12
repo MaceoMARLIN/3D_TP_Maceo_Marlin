@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerBehaviourScript : MonoBehaviour
 {
-    [Header("Movement Settings")]
     public float speedOnGround = 5f;
     public float speedInAir = 2f;
     public float jumpForce = 5f;
@@ -15,6 +15,9 @@ public class PlayerBehaviourScript : MonoBehaviour
     private bool isGrounded;
     private float currentSpeed;
 
+    public float health = 100f;
+    public Slider healthBar;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -24,19 +27,23 @@ public class PlayerBehaviourScript : MonoBehaviour
 
     void Update()
     {
-        // Mettre à jour le speed selon le sol
         currentSpeed = isGrounded ? speedOnGround : speedInAir;
 
-        // Mise à jour des paramètres Animator
         float speedModifier = moveInput.magnitude > 0 ? 1f : 0f;
         animator.SetFloat("Speed", speedModifier, 0.1f, Time.deltaTime);
         animator.SetFloat("MoveX", moveInput.x);
         animator.SetFloat("MoveY", moveInput.y);
+
+        healthBar.value = health;
+        healthBar.maxValue = 100f;
+        if (health <= 0)
+        {
+            Debug.Log("Player is dead!");
+        }
     }
 
     void FixedUpdate()
     {
-        // Calculer la direction relative à la caméra
         Vector3 camForward = Camera.main.transform.forward;
         Vector3 camRight = Camera.main.transform.right;
         camForward.y = 0f;
@@ -46,22 +53,18 @@ public class PlayerBehaviourScript : MonoBehaviour
 
         Vector3 moveDir = camForward * moveInput.y + camRight * moveInput.x;
 
-        // Rotation du personnage
         if (Mouse.current.rightButton.isPressed)
         {
-            // Regarder la caméra
             Vector3 forward = Camera.main.transform.forward;
             forward.y = 0;
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), rotationSpeed * Time.fixedDeltaTime);
         }
         else if (moveDir.sqrMagnitude > 0.01f)
         {
-            // Regarder dans la direction du mouvement
             Quaternion targetRotation = Quaternion.LookRotation(moveDir);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
         }
 
-        // Déplacement
         rb.MovePosition(rb.position + moveDir * currentSpeed * Time.fixedDeltaTime);
     }
 
@@ -85,6 +88,10 @@ public class PlayerBehaviourScript : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+        }
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            health -= 10f; 
         }
     }
 

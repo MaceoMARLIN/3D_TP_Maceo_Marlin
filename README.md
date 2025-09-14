@@ -1,1 +1,1 @@
-Pas encore fini exercice 3
+3D environment with one enemy
